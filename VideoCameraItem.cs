@@ -18,6 +18,13 @@ namespace ContentCameraMod
         private AudioClip startBeep;
         private AudioClip stopBeep;
 
+        /// <summary>Pro-flashlight body/light transform; custom mesh parents here so it follows the same hand anchor as the lens.</summary>
+        private Transform _visualAttach;
+        private Light _itemLight;
+
+        /// <summary>Uniform scale for recentersized OBJ (~handheld tool size vs pro-flashlight grip).</summary>
+        private const float CameraBodyUniformScale = 1.35f;
+
         public override void Start()
         {
             base.Start();
@@ -35,15 +42,17 @@ namespace ContentCameraMod
             
             GameObject camObj = new GameObject("CameraLens");
             
-            Light flashlightLight = this.GetComponentInChildren<Light>();
-            if (flashlightLight != null)
+            _itemLight = this.GetComponentInChildren<Light>();
+            if (_itemLight != null)
             {
-                camObj.transform.SetParent(flashlightLight.transform, false);
+                _visualAttach = _itemLight.transform;
+                camObj.transform.SetParent(_visualAttach, false);
                 camObj.transform.localPosition = Vector3.zero;
                 camObj.transform.localRotation = Quaternion.identity;
             }
             else
             {
+                _visualAttach = transform;
                 camObj.transform.SetParent(this.transform, false);
                 camObj.transform.localPosition = new Vector3(0f, 0f, 0.5f); 
                 camObj.transform.localRotation = Quaternion.Euler(0f, 90f, 0f); 
@@ -238,33 +247,40 @@ namespace ContentCameraMod
 
                 if (customMesh != null)
                 {
-                    // Disable all original renderers except the lens and scan node
-                    foreach (var r in GetComponentsInChildren<MeshRenderer>(true))
+                    Renderer templateRenderer = null;
+                    foreach (var r in GetComponentsInChildren<Renderer>(true))
                     {
-                        if (r.gameObject.name != "CameraLens" && r.gameObject.name != "ScanNode")
-                        {
-                            r.enabled = false;
-                        }
+                        if (r.gameObject.name == "CameraLens" || r.gameObject.name == "ScanNode")
+                            continue;
+                        templateRenderer = r;
+                        break;
                     }
 
-                    // Create a new GameObject for our high-quality custom model
+                    foreach (var r in GetComponentsInChildren<Renderer>(true))
+                    {
+                        if (r.gameObject.name == "CameraLens" || r.gameObject.name == "ScanNode")
+                            continue;
+                        r.enabled = false;
+                    }
+
+                    if (_itemLight != null)
+                        _itemLight.enabled = false;
+
+                    Transform attach = _visualAttach != null ? _visualAttach : transform;
                     GameObject modelObj = new GameObject("CustomCameraModel");
-                    modelObj.transform.SetParent(this.transform, false);
+                    modelObj.transform.SetParent(attach, false);
                     modelObj.layer = this.gameObject.layer;
-                    
-                    // Standard alignment for the camera model to look forward
-                    modelObj.transform.localPosition = new Vector3(0, totalShift, 0); 
-                    modelObj.transform.localRotation = Quaternion.Euler(-90, 0, 0); 
-                    modelObj.transform.localScale = Vector3.one * 4.4f; 
+                    modelObj.transform.localPosition = Vector3.zero;
+                    modelObj.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                    modelObj.transform.localScale = Vector3.one * CameraBodyUniformScale;
 
                     MeshFilter filter = modelObj.AddComponent<MeshFilter>();
                     filter.mesh = customMesh;
 
                     MeshRenderer renderer = modelObj.AddComponent<MeshRenderer>();
-                    
-                    // Match material from first original renderer if possible, or create new
-                    var originalRenderer = GetComponentInChildren<MeshRenderer>();
-                    Material mat = (originalRenderer != null) ? new Material(originalRenderer.material) : new Material(Shader.Find("HDRP/Lit"));
+                    Material mat = (templateRenderer != null)
+                        ? new Material(templateRenderer.material)
+                        : new Material(Shader.Find("HDRP/Lit"));
                     
                     if (customTex != null)
                     {
@@ -290,16 +306,13 @@ namespace ContentCameraMod
                 }
                 else if (customTex != null)
                 {
-                    // Fallback to original mesh if OBJ failed
-                    foreach (var r in GetComponentsInChildren<MeshRenderer>())
+                    foreach (var r in GetComponentsInChildren<Renderer>(true))
                     {
-                        if (r.gameObject.name != "CameraLens")
-                        {
-                            r.material.mainTexture = customTex;
-                            r.material.SetTexture("_BaseColorMap", customTex);
-                            r.material.SetTexture("_BaseMap", customTex);
-                            r.material.color = Color.white;
-                        }
+                        if (r.gameObject.name == "CameraLens") continue;
+                        r.material.mainTexture = customTex;
+                        r.material.SetTexture("_BaseColorMap", customTex);
+                        r.material.SetTexture("_BaseMap", customTex);
+                        r.material.color = Color.white;
                     }
                     ContentCameraPlugin.Instance.LoggerObj.LogInfo("Applied texture to original mesh (fallback).");
                 }

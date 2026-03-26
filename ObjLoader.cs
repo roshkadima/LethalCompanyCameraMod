@@ -57,8 +57,23 @@ namespace ContentCameraMod
             mesh.SetUVs(0, uvs);
             mesh.SetTriangles(triangles, 0);
             mesh.RecalculateBounds();
-            
+            RecenterMeshToBoundsCenter(mesh);
             return mesh;
+        }
+
+        /// <summary>
+        /// Moves vertex data so the axis-aligned bounds center is at the origin (fixes Blender exports with a far-off pivot).
+        /// </summary>
+        public static void RecenterMeshToBoundsCenter(Mesh mesh)
+        {
+            if (mesh == null) return;
+            Vector3 c = mesh.bounds.center;
+            Vector3[] verts = mesh.vertices;
+            for (int i = 0; i < verts.Length; i++)
+                verts[i] -= c;
+            mesh.vertices = verts;
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
         }
 
         private static void AddFacePoint(string part, List<Vector3> temp_v, List<Vector2> temp_uv, List<Vector3> temp_vn, 

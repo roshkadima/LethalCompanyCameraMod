@@ -1,6 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 using System.Linq;
+using System.Reflection;
 using GameNetcodeStuff;
 
 namespace ContentCameraMod
@@ -9,6 +10,24 @@ namespace ContentCameraMod
     public class GamePatches
     {
         public static Item CameraItemDef;
+
+        /// <summary>
+        /// Nudge hold pose after swapping in a recentersized camera mesh (field names vary by game build; missing fields are skipped).
+        /// </summary>
+        static void ApplyVideoCameraHoldOffsets(Item item)
+        {
+            if (item == null) return;
+            var t = item.GetType();
+            void AddVec(string fieldName, Vector3 delta)
+            {
+                FieldInfo f = t.GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
+                if (f == null || f.FieldType != typeof(Vector3)) return;
+                var cur = (Vector3)f.GetValue(item);
+                f.SetValue(item, cur + delta);
+            }
+            AddVec("positionOffset", new Vector3(0f, 0.02f, 0.04f));
+            AddVec("rotationOffset", new Vector3(-6f, 0f, 2f));
+        }
 
         [HarmonyPatch("Awake")]
         [HarmonyPostfix]
@@ -24,6 +43,7 @@ namespace ContentCameraMod
             CameraItemDef.creditsWorth = 1;
             // WEIGHTLESS FIX: 1.0f in LC means 0 lb weight
             CameraItemDef.weight = 1.0f; 
+            ApplyVideoCameraHoldOffsets(CameraItemDef);
             // Visuals are shifted locally in VideoCameraItem.Start
 
             GameObject prefab = Object.Instantiate(flashlight.spawnPrefab);
