@@ -1,0 +1,10 @@
+C:\MOD\ContentCameraMod\bin\Debug\netstandard2.1\ContentCameraMod.deps.json
+C:\MOD\ContentCameraMod\bin\Debug\netstandard2.1\ContentCameraMod.dll
+C:\MOD\ContentCameraMod\bin\Debug\netstandard2.1\ContentCameraMod.pdb
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.csproj.AssemblyReference.cache
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.GeneratedMSBuildEditorConfig.editorconfig
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.AssemblyInfoInputs.cache
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.AssemblyInfo.cs
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.csproj.CoreCompileInputs.cache
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.dll
+C:\MOD\ContentCameraMod\obj\Debug\netstandard2.1\ContentCameraMod.pdb

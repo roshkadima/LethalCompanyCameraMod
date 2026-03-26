@@ -1,0 +1,11 @@
+Model Information:
+* title:	Camera With Tripod
+* source:	https://sketchfab.com/3d-models/camera-with-tripod-cc324baf6dc548de965c3a47b87f1e27
+* author:	FatWasHere (https://sketchfab.com/fathin880)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Camera With Tripod" (https://sketchfab.com/3d-models/camera-with-tripod-cc324baf6dc548de965c3a47b87f1e27) by FatWasHere (https://sketchfab.com/fathin880) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
